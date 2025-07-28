@@ -30,6 +30,8 @@ env/
 # Jupyter Notebook
 .ipynb_checkpoints
 *.ipynb
+# Allow specific notebooks
+!CarDekho*.ipynb
 
 # Development files
 gui_app.py

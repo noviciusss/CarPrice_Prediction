@@ -209,14 +209,14 @@ def main():
     st.sidebar.info("""
     **What is "Train New Model"?**
     
-    🎯 This retrains the AI model with fresh data for better predictions.
+     This retrains the AI model with fresh data for better predictions.
     
-    ⏱️ **When to use:**
+     **When to use:**
     - Model seems inaccurate
     - Want to refresh predictions
     - After data updates
     
-    ⚠️ **Note:** Training takes ~2-3 minutes
+     **Note:** Training takes ~2-3 minutes
     """)
     
     if st.sidebar.button("Train New Model", help="Train a fresh XGBoost model"):
@@ -243,10 +243,10 @@ def main():
         
         with st.spinner("Training XGBoost model with full dataset..."):
             if train_and_save_model(progress_callback=update_progress):
-                st.success("✅ Model trained successfully! Future visits will be instant. Refreshing app...")
+                st.success(" Model trained successfully! Future visits will be instant. Refreshing app...")
                 st.rerun()
             else:
-                st.error("❌ Failed to train model. Please check the dataset and try again.")
+                st.error(" Failed to train model. Please check the dataset and try again.")
         return
     
     # Main content
