@@ -151,11 +151,10 @@ For detailed deployment instructions, see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE
 2. **Model Training:**
    - Algorithm: XGBoost Regressor (base configuration)
    - Train-test split: 75%-25%
-   - Random state: 42 for reproducibility
 
 3. **Performance Metrics:**
-   - R² Score: 86.26%
-   - Mean Absolute Error: ₹102,236
+   - R² Score: 92.2%
+   - Mean Absolute Error: ₹92,236
    - Training on 15,413 records
 
 ## 🎯 Price Categories
