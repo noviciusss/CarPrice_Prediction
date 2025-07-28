@@ -419,8 +419,20 @@ def main():
             st.markdown("---")
         
         # Prepare input data (convert year to vehicle_age)
-        current_year = 2024  # You can update this or make it dynamic
+        # Note: The dataset appears to be from around 2019-2020 based on vehicle_age patterns
+        # We need to calculate vehicle_age correctly: older cars should have higher vehicle_age
+        current_year = 2025  # Updated to current year
         vehicle_age = current_year - year
+        
+        # Validation: Ensure vehicle_age makes sense
+        if vehicle_age < 0:
+            st.warning("⚠️ Manufacturing year cannot be in the future!")
+            vehicle_age = 0
+        elif vehicle_age > 40:
+            st.warning("⚠️ Car is very old (40+ years). Prediction may be less accurate.")
+        
+        # Show vehicle age for user confirmation
+        st.info(f"📅 **Vehicle Age:** {vehicle_age} years old")
         
         input_data = {
             'model': model_name,
@@ -470,6 +482,31 @@ def main():
                     st.markdown(f"- **Lakhs:** ₹{predicted_price/100000:.2f} L")
                     if predicted_price >= 1000000:
                         st.markdown(f"- **Crores:** ₹{predicted_price/10000000:.2f} Cr")
+                    
+                    # Show prediction logic
+                    st.markdown("---")
+                    st.markdown("### 🔍 Prediction Logic")
+                    st.markdown(f"""
+                    **Key Factors:**
+                    - 📅 Vehicle Age: {vehicle_age} years (newer = higher value)
+                    - 🚗 Model: {model_name}
+                    - ⛽ Fuel: {fuel_type}
+                    - 🔧 Transmission: {transmission_type}
+                    - 📏 Mileage: {mileage} kmpl
+                    - ⚡ Power: {max_power} bhp
+                    """)
+                    
+                    # Age impact explanation
+                    if vehicle_age <= 2:
+                        age_impact = "📈 Very new car - highest value retention"
+                    elif vehicle_age <= 5:
+                        age_impact = "📊 Relatively new - good value retention"
+                    elif vehicle_age <= 10:
+                        age_impact = "📉 Moderate age - expect some depreciation"
+                    else:
+                        age_impact = "📉 Older car - significant depreciation expected"
+                    
+                    st.markdown(f"**Age Impact:** {age_impact}")
         
         # Model information
         st.markdown("---")
