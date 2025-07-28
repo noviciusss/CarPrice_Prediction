@@ -185,7 +185,7 @@ def main():
         with st.spinner("Training model... Please wait."):
             if train_and_save_model():
                 st.sidebar.success("Model trained and saved successfully!")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.sidebar.error("Failed to train model")
     
@@ -198,7 +198,7 @@ def main():
             with st.spinner("Training model... Please wait."):
                 if train_and_save_model():
                     st.success("Model trained successfully!")
-                    st.experimental_rerun()
+                    st.rerun()
         return
     
     # Main content
