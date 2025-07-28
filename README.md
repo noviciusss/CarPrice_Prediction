@@ -4,7 +4,7 @@ A machine learning web application that predicts car prices using XGBoost algori
 
 ## 🌟 Live Demo
 
-**[Try the Live App →](https://your-app-name.streamlit.app)** _(Replace with your deployed URL)_
+**[Try the Live App →](https://carpriceprediction-noviciusss.streamlit.app/)
 
 ## 📊 Features
 
@@ -18,7 +18,7 @@ A machine learning web application that predicts car prices using XGBoost algori
 ## 🤖 Model Performance
 
 - **Algorithm:** XGBoost Regressor
-- **R² Score:** 86.26% accuracy
+- **R² Score:** 94.26% accuracy
 - **Features:** 10 input features
 - **Training Data:** 15,413 car records
 
@@ -167,11 +167,9 @@ For detailed deployment instructions, see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE
 
 ## 🔮 Future Enhancements
 
-- [ ] Hyperparameter tuning for better accuracy
 - [ ] Additional features (car condition, location)
 - [ ] Model ensemble for improved predictions
 - [ ] Real-time market data integration
-- [ ] Mobile app version
 - [ ] API endpoints for integration
 
 ## 🤝 Contributing
@@ -190,7 +188,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Your Name**
 - GitHub: [@noviciusss](https://github.com/noviciusss)
-- LinkedIn: [yourprofile](https://linkedin.com/in/yourprofile)
+- LinkedIn: [yourprofile](https://www.linkedin.com/in/spsamar/)
 
 ## 🙏 Acknowledgments
 
