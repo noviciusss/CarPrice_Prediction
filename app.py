@@ -99,7 +99,7 @@ def train_and_save_model(progress_callback=None):
     if progress_callback:
         progress_callback(10, "📊 Data loaded successfully")
     
-    # Data preprocessing
+    # Data preprocessing - drop non-predictive columns
     df = df.drop(['car_name', 'brand'], axis=1, errors='ignore')
     
     if progress_callback:
@@ -209,7 +209,20 @@ def main():
         return
     
     # Sidebar for model management
-    st.sidebar.markdown('<h2 class="sub-header">Model Management</h2>', unsafe_allow_html=True)
+    st.sidebar.markdown('<h2 class="sub-header">🤖 Model Management</h2>', unsafe_allow_html=True)
+    
+    st.sidebar.info("""
+    **What is "Train New Model"?**
+    
+    🎯 This retrains the AI model with fresh data for better predictions.
+    
+    ⏱️ **When to use:**
+    - Model seems inaccurate
+    - Want to refresh predictions
+    - After data updates
+    
+    ⚠️ **Note:** Training takes ~2-3 minutes
+    """)
     
     if st.sidebar.button("Train New Model", help="Train a fresh XGBoost model"):
         with st.spinner("Training model... Please wait."):
@@ -317,37 +330,93 @@ def main():
             st.markdown('<div class="feature-box">', unsafe_allow_html=True)
             st.markdown("**Car Details**")
             
-            col_e, col_f, col_g = st.columns(3)
-            with col_e:
-                model_name = st.selectbox(
-                    "Model", 
-                    options=sorted(df['model'].unique()),
-                    help="Car model"
+            # Brand selection
+            col_brand, col_model = st.columns(2)
+            with col_brand:
+                selected_brand = st.selectbox(
+                    "Brand", 
+                    options=["All Brands"] + sorted(df['brand'].unique()),
+                    help="Select car brand first to filter models"
                 )
             
-            with col_f:
+            # Filter models based on selected brand
+            if selected_brand == "All Brands":
+                available_models = sorted(df['model'].unique())
+                available_car_names = sorted(df['car_name'].unique())
+            else:
+                brand_df = df[df['brand'] == selected_brand]
+                available_models = sorted(brand_df['model'].unique())
+                available_car_names = sorted(brand_df['car_name'].unique())
+            
+            with col_model:
+                model_name = st.selectbox(
+                    "Model", 
+                    options=available_models,
+                    help="Car model (filtered by selected brand)"
+                )
+            
+            # Car name selection (full car name)
+            car_name = st.selectbox(
+                "Full Car Name (Optional)", 
+                options=["Select Model First"] + available_car_names,
+                help="Complete car name for more specific prediction"
+            )
+            
+            # Other car details
+            col_seller, col_fuel, col_transmission = st.columns(3)
+            with col_seller:
                 seller_type = st.selectbox(
                     "Seller Type", 
                     options=df['seller_type'].unique(),
                     help="Type of seller"
                 )
             
-            with col_g:
+            with col_fuel:
                 fuel_type = st.selectbox(
                     "Fuel Type", 
                     options=df['fuel_type'].unique(),
                     help="Type of fuel used"
                 )
             
-            transmission_type = st.selectbox(
-                "Transmission Type", 
-                options=df['transmission_type'].unique(),
-                help="Type of transmission"
-            )
+            with col_transmission:
+                transmission_type = st.selectbox(
+                    "Transmission Type", 
+                    options=df['transmission_type'].unique(),
+                    help="Type of transmission"
+                )
             st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Smart suggestions based on selected car
+        if selected_brand != "All Brands" and model_name:
+            similar_cars = df[(df['brand'] == selected_brand) & (df['model'] == model_name)]
+            if not similar_cars.empty:
+                st.markdown('<div class="feature-box">', unsafe_allow_html=True)
+                st.markdown("**💡 Smart Suggestions (Based on Similar Cars)**")
+                avg_mileage = similar_cars['mileage'].mean()
+                avg_engine = similar_cars['engine'].mode().iloc[0] if not similar_cars['engine'].mode().empty else 1200
+                avg_power = similar_cars['max_power'].mean()
+                common_fuel = similar_cars['fuel_type'].mode().iloc[0] if not similar_cars['fuel_type'].mode().empty else 'Petrol'
+                
+                st.info(f"""
+                📊 **Typical specs for {selected_brand} {model_name}:**
+                - Average Mileage: {avg_mileage:.1f} kmpl
+                - Common Engine: {avg_engine:.0f} CC
+                - Average Power: {avg_power:.1f} bhp
+                - Popular Fuel: {common_fuel}
+                """)
+                st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
         st.markdown('<h2 class="sub-header">💰 Price Prediction</h2>', unsafe_allow_html=True)
+        
+        # Show selected car summary
+        if selected_brand != "All Brands":
+            st.markdown("### 🚗 Selected Car")
+            st.markdown(f"**Brand:** {selected_brand}")
+            st.markdown(f"**Model:** {model_name}")
+            if car_name != "Select Model First":
+                st.markdown(f"**Full Name:** {car_name}")
+            st.markdown("---")
         
         # Prepare input data (convert year to vehicle_age)
         current_year = 2024  # You can update this or make it dynamic
