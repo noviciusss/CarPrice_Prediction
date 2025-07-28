@@ -145,13 +145,8 @@ def train_and_save_model(progress_callback=None):
         progress_callback(60, "🤖 Training XGBoost model...")
     
     # Train XGBoost model with optimized parameters
-    model = XGBRegressor(
-        random_state=42,
-        n_estimators=100,
-        max_depth=6,
-        learning_rate=0.1,
-        n_jobs=-1  # Use all CPU cores for faster training
-    )
+    # Note: Parameters can be tuned further based on validation performance
+    model = XGBRegressor()
     model.fit(X_processed, y_log)
     
     if progress_callback:
@@ -236,7 +231,7 @@ def main():
     model, preprocessor, label_encoder = load_model_and_preprocessor()
     
     if model is None:
-        st.info("🔄 Training ML model on first visit (this only happens once!)")
+        st.info("🔄 Training ML model on first visit ")
         
         # Create progress bar and status text
         progress_bar = st.progress(0)
