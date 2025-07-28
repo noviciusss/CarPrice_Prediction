@@ -4,7 +4,7 @@ A machine learning web application that predicts car prices using XGBoost algori
 
 ## 🌟 Live Demo
 
-**[Try the Live App →]([https://your-app-name.streamlit.app](https://carpriceprediction-noviciusss.streamlit.app/))
+**[Try the Live App →](https://carpriceprediction-noviciusss.streamlit.app/)
 
 ## 📊 Features
 
