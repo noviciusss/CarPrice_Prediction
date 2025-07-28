@@ -85,9 +85,21 @@ def load_model_and_preprocessor():
     try:
         with open('car_price_model.pkl', 'rb') as f:
             model_data = pickle.load(f)
+        
+        # Test if the model works with current sklearn version
+        test_data = pd.DataFrame({
+            'model': [0], 'vehicle_age': [5], 'km_driven': [50000],
+            'seller_type': ['Individual'], 'fuel_type': ['Petrol'],
+            'transmission_type': ['Manual'], 'mileage': [18.9],
+            'engine': [1197], 'max_power': [89.8], 'seats': [5]
+        })
+        
+        # Try to transform test data to check compatibility
+        model_data['preprocessor'].transform(test_data)
+        
         return model_data['model'], model_data['preprocessor'], model_data['label_encoder']
-    except FileNotFoundError:
-        st.error("Model file not found. Please train the model first.")
+    except (FileNotFoundError, AttributeError, ValueError, KeyError) as e:
+        st.warning(f"Model compatibility issue detected: {type(e).__name__}. Retraining model...")
         return None, None, None
 
 def train_and_save_model():
@@ -114,14 +126,14 @@ def train_and_save_model():
     num_features = X.select_dtypes(exclude='object').columns
     cat_features = ['seller_type', 'fuel_type', 'transmission_type']
     
-    # Create preprocessor
+    # Create preprocessor with explicit remainder handling
     numeric_transformer = StandardScaler()
-    oh_transformer = OneHotEncoder(drop='first')
+    oh_transformer = OneHotEncoder(drop='first', sparse_output=False)
     
     preprocessor = ColumnTransformer([
         ("OneHotEncoder", oh_transformer, cat_features),
         ("StandardScaler", numeric_transformer, num_features)
-    ], remainder='passthrough')
+    ], remainder='drop', verbose_feature_names_out=False)
     
     # Fit preprocessor and transform data
     X_processed = preprocessor.fit_transform(X)
@@ -193,12 +205,15 @@ def main():
     model, preprocessor, label_encoder = load_model_and_preprocessor()
     
     if model is None:
-        st.warning("No trained model found. Please train a model first using the sidebar.")
-        if st.button("Train Model Now"):
-            with st.spinner("Training model... Please wait."):
+        with st.container():
+            st.info("🔄 Model compatibility issue detected. Automatically retraining model with current dependencies...")
+            with st.spinner("Training model... This may take a moment."):
                 if train_and_save_model():
-                    st.success("Model trained successfully!")
+                    st.success("✅ Model trained successfully! Refreshing app...")
                     st.rerun()
+                else:
+                    st.error("❌ Failed to train model. Please check the dataset and try again.")
+                    st.stop()
         return
     
     # Main content
