@@ -85,31 +85,25 @@ def load_model_and_preprocessor():
     try:
         with open('car_price_model.pkl', 'rb') as f:
             model_data = pickle.load(f)
-        
-        # Test if the model works with current sklearn version
-        test_data = pd.DataFrame({
-            'model': [0], 'vehicle_age': [5], 'km_driven': [50000],
-            'seller_type': ['Individual'], 'fuel_type': ['Petrol'],
-            'transmission_type': ['Manual'], 'mileage': [18.9],
-            'engine': [1197], 'max_power': [89.8], 'seats': [5]
-        })
-        
-        # Try to transform test data to check compatibility
-        model_data['preprocessor'].transform(test_data)
-        
         return model_data['model'], model_data['preprocessor'], model_data['label_encoder']
-    except (FileNotFoundError, AttributeError, ValueError, KeyError) as e:
-        st.warning(f"Model compatibility issue detected: {type(e).__name__}. Retraining model...")
+    except FileNotFoundError:
+        st.error("Model file not found. Please train the model first.")
         return None, None, None
 
-def train_and_save_model():
+def train_and_save_model(progress_callback=None):
     """Train the model and save it"""
     df = load_data()
     if df is None:
         return False
     
+    if progress_callback:
+        progress_callback(10, "📊 Data loaded successfully")
+    
     # Data preprocessing
     df = df.drop(['car_name', 'brand'], axis=1, errors='ignore')
+    
+    if progress_callback:
+        progress_callback(20, "🔧 Preprocessing data...")
     
     # Prepare features and target
     X = df.drop(['selling_price'], axis=1)
@@ -117,6 +111,9 @@ def train_and_save_model():
     
     # Apply log transformation to target
     y_log = np.log1p(y)
+    
+    if progress_callback:
+        progress_callback(30, "🏷️ Encoding features...")
     
     # Encode model feature
     label_encoder = LabelEncoder()
@@ -126,7 +123,10 @@ def train_and_save_model():
     num_features = X.select_dtypes(exclude='object').columns
     cat_features = ['seller_type', 'fuel_type', 'transmission_type']
     
-    # Create preprocessor with explicit remainder handling
+    if progress_callback:
+        progress_callback(40, "⚙️ Setting up preprocessors...")
+    
+    # Create preprocessor
     numeric_transformer = StandardScaler()
     oh_transformer = OneHotEncoder(drop='first', sparse_output=False)
     
@@ -135,12 +135,27 @@ def train_and_save_model():
         ("StandardScaler", numeric_transformer, num_features)
     ], remainder='drop', verbose_feature_names_out=False)
     
+    if progress_callback:
+        progress_callback(50, "🔄 Transforming data...")
+    
     # Fit preprocessor and transform data
     X_processed = preprocessor.fit_transform(X)
     
-    # Train XGBoost model
-    model = XGBRegressor(random_state=42)
+    if progress_callback:
+        progress_callback(60, "🤖 Training XGBoost model...")
+    
+    # Train XGBoost model with optimized parameters
+    model = XGBRegressor(
+        random_state=42,
+        n_estimators=100,
+        max_depth=6,
+        learning_rate=0.1,
+        n_jobs=-1  # Use all CPU cores for faster training
+    )
     model.fit(X_processed, y_log)
+    
+    if progress_callback:
+        progress_callback(90, "💾 Saving model...")
     
     # Save model and preprocessor
     model_data = {
@@ -151,6 +166,9 @@ def train_and_save_model():
     
     with open('car_price_model.pkl', 'wb') as f:
         pickle.dump(model_data, f)
+    
+    if progress_callback:
+        progress_callback(100, "✅ Model training completed!")
     
     return True
 
@@ -205,15 +223,22 @@ def main():
     model, preprocessor, label_encoder = load_model_and_preprocessor()
     
     if model is None:
-        with st.container():
-            st.info("🔄 Model compatibility issue detected. Automatically retraining model with current dependencies...")
-            with st.spinner("Training model... This may take a moment."):
-                if train_and_save_model():
-                    st.success("✅ Model trained successfully! Refreshing app...")
-                    st.rerun()
-                else:
-                    st.error("❌ Failed to train model. Please check the dataset and try again.")
-                    st.stop()
+        st.info("🔄 Training ML model on first visit (this only happens once!)")
+        
+        # Create progress bar and status text
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
+        def update_progress(progress, message):
+            progress_bar.progress(progress)
+            status_text.text(message)
+        
+        with st.spinner("Training XGBoost model with full dataset..."):
+            if train_and_save_model(progress_callback=update_progress):
+                st.success("✅ Model trained successfully! Future visits will be instant. Refreshing app...")
+                st.rerun()
+            else:
+                st.error("❌ Failed to train model. Please check the dataset and try again.")
         return
     
     # Main content
