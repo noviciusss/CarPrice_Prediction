@@ -28,8 +28,8 @@ A machine learning web application that predicts car prices using XGBoost algori
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/cardekho-price-predictor.git
-   cd cardekho-price-predictor
+   git clone https://github.com/noviciusss/CarPrice_Prediction.git
+   cd CarPrice_Prediction
    ```
 
 2. **Install dependencies:**
@@ -189,7 +189,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
+- GitHub: [@noviciusss](https://github.com/noviciusss)
 - LinkedIn: [yourprofile](https://linkedin.com/in/yourprofile)
 
 ## 🙏 Acknowledgments
@@ -202,8 +202,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 If you have any questions or issues:
-- 🐛 [Report bugs](https://github.com/yourusername/cardekho-price-predictor/issues)
-- 💡 [Request features](https://github.com/yourusername/cardekho-price-predictor/issues)
+- 🐛 [Report bugs](https://github.com/noviciusss/CarPrice_Prediction/issues)
+- 💡 [Request features](https://github.com/noviciusss/CarPrice_Prediction/issues)
 - 📧 Contact: your.email@domain.com
 
 ---

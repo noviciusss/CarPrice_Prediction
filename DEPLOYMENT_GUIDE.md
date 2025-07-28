@@ -11,7 +11,7 @@
    git add .
    git commit -m "Initial commit - CarDekho Price Predictor"
    git branch -M main
-   git remote add origin https://github.com/yourusername/cardekho-price-predictor.git
+   git remote add origin https://github.com/noviciusss/CarPrice_Prediction.git
    git push -u origin main
    ```
 
